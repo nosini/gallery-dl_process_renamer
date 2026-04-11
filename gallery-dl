@@ -1,0 +1,12 @@
+#!/bin/bash
+VENV_PY="$HOME/.local/share/pipx/venvs/gallery-dl/bin/python"
+PROC_PY="$HOME/.local/share/pipx/venvs/gallery-dl/bin/gallery-dl-proc"
+
+# Auto-heal: If our custom binary is missing, or pipx updated the original Python, recreate it.
+if [ ! -f "$PROC_PY" ] || [ "$(realpath "$VENV_PY")" -nt "$PROC_PY" ]; then
+    cp --preserve=timestamps "$(realpath "$VENV_PY")" "$PROC_PY"
+fi
+
+# The 'exec' command is crucial here. It replaces the bash shell with our custom binary,
+# ensuring Nekobox sees 'gallery-dl-proc' as the actual process making the connection.
+exec "$PROC_PY" -m gallery_dl "$@"
